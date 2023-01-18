@@ -196,7 +196,14 @@ public class Checkbox extends Button {
         public void execute( Button source ) {
             if( source instanceof Checkbox ) {
                 Checkbox cb = (Checkbox)source;
-                cb.setChecked(!cb.isChecked());
+                
+                final CheckboxGroup cg = cb.getModel()
+                                           .getGroup();
+                if ( cg != null) {
+                    cg.setSelected(cb.getModel(), true);
+                } else {
+                    cb.setChecked(!cb.isChecked());
+                }
             }
         }
     }

@@ -43,6 +43,23 @@ import com.simsilica.lemur.core.VersionedObject;
  *  @author    Paul Speed
  */
 public interface CheckboxModel extends VersionedObject<Boolean> {
+    
+    /**
+     * Identifies the group the checkbox belongs to .
+     * 
+     * @param group the <code>CheckboxGroup</code> the checkbox belongs to
+     * @since 1.16.1-SNAPSHOT
+     */
+    public void setGroup(CheckboxGroup group);
+    
+    /**
+     * Returns the group that the checkbox belongs to.
+     * 
+     * @return the <code>CheckboxGroup</code> that the checkbox belongs to
+     * @since 1.16.1-SNAPSHOT
+     */
+    public CheckboxGroup getGroup();
+    
     public void setChecked( boolean state );
     public boolean isChecked();
 }
