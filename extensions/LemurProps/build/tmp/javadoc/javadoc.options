@@ -1,0 +1,8 @@
+-Xdoclint:none '-quiet'
+-classpath '/home/wil/NetBeansProjects/Lemur/extensions/LemurProps/build/classes/java/main:/home/wil/NetBeansProjects/Lemur/extensions/LemurProps/build/resources/main:/home/wil/NetBeansProjects/Lemur/build/classes/java/main:/home/wil/.gradle/caches/modules-2/files-2.1/org.jmonkeyengine/jme3-core/3.1.0-stable/cfe061b23799eeda04adfcc01802c89b88a77f59/jme3-core-3.1.0-stable.jar'
+-d '/home/wil/NetBeansProjects/Lemur/extensions/LemurProps/build/docs/javadoc'
+-doctitle 'lemur-props 1.2.0 API'
+-notimestamp 
+-quiet 
+-windowtitle 'lemur-props 1.2.0 API'
+'/home/wil/NetBeansProjects/Lemur/extensions/LemurProps/src/main/java/com/simsilica/lemur/props/PropertyPanel.java'

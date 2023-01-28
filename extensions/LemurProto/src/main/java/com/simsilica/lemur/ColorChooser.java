@@ -53,9 +53,9 @@ import com.simsilica.lemur.core.VersionedReference;
 import com.simsilica.lemur.event.CursorButtonEvent;
 import com.simsilica.lemur.event.CursorEventControl;
 import com.simsilica.lemur.event.DefaultCursorListener;
+import com.simsilica.lemur.math.ColorHSBA;
 import com.simsilica.lemur.style.ElementId;
 import com.simsilica.lemur.style.Styles;
-import java.awt.Color;
 
 
 /**
@@ -77,8 +77,8 @@ public class ColorChooser extends Panel {
         ImageRaster raster = ImageRaster.create(defaultTexture.getImage());
         for( int i = 0; i < 256; i++ ) {
             for( int j = 0; j < 256; j++ ) {
-                Color hsb = Color.getHSBColor(i/255f, j/255f, 0.5f);
-                raster.setPixel(i, j, toJmeColor(hsb));
+                ColorRGBA rgba = ColorHSBA.toJmeColorRGBA(new ColorHSBA(i/255f, j/255f, 0.5f, 1.0f));
+                raster.setPixel(i, j, rgba);
             }
         }
     }
@@ -95,9 +95,10 @@ public class ColorChooser extends Panel {
     private Slider brightness;
     private VersionedReference brightnessRef;
 
-    private float hIndex = 0;
-    private float sIndex = 0;
-    private float bIndex = 0.5f;
+    /**
+     * @since 1.16.1-SNAPSHOT
+     */
+    private ColorHSBA myValueColor = new ColorHSBA(0.0F, 0.0F, 0.5F, 1.0F);
 
     public ColorChooser() {
         this(true, null, new ElementId(ELEMENT_ID), null);
@@ -187,49 +188,39 @@ public class ColorChooser extends Panel {
     }
 
     protected void updateModelValue( float h, float s, float b ) {
-        if( h == hIndex && s == sIndex && b == bIndex ) {
+        if( h == myValueColor.getHue()        && 
+            s == myValueColor.getSaturation() &&
+            b == myValueColor.getBrightness() ) {
             return;
         }
-        this.hIndex = h;
-        this.sIndex = s;
-        this.bIndex = b;
-
-        Color awtColor = Color.getHSBColor(hIndex, sIndex, bIndex);
-        ((VersionedHolder<ColorRGBA>)model).setObject(toJmeColor(awtColor));
+        
+        this.myValueColor.setHue(h);
+        this.myValueColor.setSaturation(s);
+        this.myValueColor.setBrightness(b);
+        
+        ((VersionedHolder<ColorRGBA>)model).setObject(ColorHSBA.toJmeColorRGBA(myValueColor));
     }
 
     protected void updateBrightness() {
         float v = (float)(brightness.getModel().getValue()/100);
-        updateModelValue(hIndex, sIndex, v);
-    }
-
-    protected static ColorRGBA toJmeColor( Color clr ) {
-        float r = clr.getRed() / 255f;
-        float g = clr.getGreen() / 255f;
-        float b = clr.getBlue() / 255f;
-        return new ColorRGBA(r, g, b, 1);
+        updateModelValue(myValueColor.getHue(), myValueColor.getSaturation(), v);
     }
 
     protected void updateColorView() {
 
         ColorRGBA c = model.getObject();
+        ColorHSBA hsb = ColorHSBA.toJmeColorHSBA(c);
 
-        int r = (int)Math.round(c.getRed() * 255);
-        int g = (int)Math.round(c.getGreen() * 255);
-        int b = (int)Math.round(c.getBlue() * 255);
-        float[] hsb = Color.RGBtoHSB(r, g, b, null);
-
-        this.hIndex = hsb[0];
-        this.sIndex = hsb[1];
-        this.bIndex = hsb[2];
-
-        updateColorView(hsb[0], hsb[1], hsb[2]);
+        this.myValueColor.setHue(hsb.getHue());
+        this.myValueColor.setSaturation(hsb.getSaturation());
+        this.myValueColor.setBrightness(hsb.getBrightness());
+        
+        updateColorView(hsb.getHue(), hsb.getSaturation(), hsb.getBrightness());
     }
 
     protected void updateColorView( float h, float s, float v ) {
 
-        Color awtColor = Color.getHSBColor(h, s, v);
-        valueColor.setColor(toJmeColor(awtColor));
+        valueColor.setColor(ColorHSBA.toJmeColorRGBA(new ColorHSBA(h, s, v, 1.0F)));
 
         // Now we need to get the B of the HSB to set that one
         brightness.getModel().setValue(v * 100);
@@ -245,7 +236,7 @@ public class ColorChooser extends Panel {
             Vector3f size = colors.getSize();
             float h = (local.x / size.x);
             float s = (size.y + local.y) / size.y;
-            updateModelValue(h, s, bIndex);
+            updateModelValue(h, s, myValueColor.getBrightness());
         }
     }
 }
